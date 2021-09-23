@@ -6,7 +6,7 @@ https://github.com/esby97/Messenger-Forensics
 
 Usage for MY Application is as below.
 
-#1. copy SharedPreferences to Rogue App.
+# 1. copy SharedPreferences to Rogue App.
 ```
 cd /data/data/com.android.keystore.androidkeystoredemo
 mkdir shared_prefs
