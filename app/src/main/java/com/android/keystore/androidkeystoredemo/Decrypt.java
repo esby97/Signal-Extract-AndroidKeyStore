@@ -20,13 +20,17 @@ import javax.crypto.spec.GCMParameterSpec;
 /**
  * Created by saurav.p on 8/23/2017.
  */
+// Changed by hunjison
 
 class Decrypt {
 
     private static final String TRANSFORMATION = "AES/GCM/NoPadding";
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
+    private static final int GCM_TAG_LENGTH = 16;
 
     private KeyStore keyStore;
+    // Changed by hunjison
+    public SecretKey signalkey;
 
     Decrypt() throws CertificateException, NoSuchAlgorithmException, KeyStoreException,
             IOException {
@@ -46,13 +50,27 @@ class Decrypt {
 
         final Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         final GCMParameterSpec spec = new GCMParameterSpec(128, encryptionIv);
-        cipher.init(Cipher.DECRYPT_MODE, getSecretKey(alias), spec);
+
+        SecretKey tmp = getSecretKey(alias);
+        this.signalkey = tmp;
+        cipher.init(Cipher.DECRYPT_MODE, tmp, spec);
 
         return new String(cipher.doFinal(encryptedData), "UTF-8");
     }
 
-    private SecretKey getSecretKey(final String alias) throws NoSuchAlgorithmException,
+    public SecretKey getSecretKey(final String alias) throws NoSuchAlgorithmException,
             UnrecoverableEntryException, KeyStoreException {
         return ((KeyStore.SecretKeyEntry) keyStore.getEntry(alias, null)).getSecretKey();
+    }
+
+    // Changed by hunjison
+    public static byte[] AESGCM_decrypt(byte[] cipherText, SecretKey key, byte[] IV) throws Exception
+    {
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH * 8, IV);
+
+        cipher.init(Cipher.DECRYPT_MODE, key, gcmParameterSpec);
+        byte[] decryptedText = cipher.doFinal(cipherText);
+        return decryptedText;
     }
 }
